@@ -128,7 +128,7 @@ ENV/
 env.bak/
 venv.bak/
 .idea
-SubModules
+.idea/SubModules
 
 # Spyder project settings
 .spyderproject
