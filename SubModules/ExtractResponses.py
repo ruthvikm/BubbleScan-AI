@@ -5,35 +5,113 @@ import json
 import numpy as np
 
 
-def process_bubble_row(image, num_choices=5):
+# def process_bubble_row(image, num_choices=5):
+#     bubble_width = image.shape[1] // num_choices
+#     max_white_pixels = 0
+#     filled_bubble_index = None
+#     filled_bubble_count = 0  # To count the number of filled bubbles
+#
+#     # Convert the image to grayscale and apply a threshold to get a binary image
+#     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+#
+#     min_white_pixels_to_fill = binary.size // num_choices * 0.3
+#
+#     for i in range(num_choices):
+#         bubble = binary[:, i * bubble_width:(i + 1) * bubble_width]
+#         white_pixels = cv2.countNonZero(bubble)
+#
+#         if white_pixels > max_white_pixels:
+#             max_white_pixels = white_pixels
+#             filled_bubble_index = i
+#
+#         # Check if the bubble is considered filled
+#         if white_pixels >= min_white_pixels_to_fill:
+#             filled_bubble_count += 1
+#
+#     # Return None if more than one bubble is filled or if no bubble is sufficiently filled
+#     if filled_bubble_count != 1:
+#         return None
+#
+#     return chr(ord('A') + filled_bubble_index) if filled_bubble_index is not None else None
+
+# def process_bubble_row(self, image, num_choices=5):
+#     bubble_width = image.shape[1] // num_choices
+#     max_white_pixels = 0
+#     filled_bubble_index = None
+#     filled_bubble_count = 0  # To count the number of filled bubbles
+#
+#     # Convert the image to grayscale and apply a threshold to get a binary image
+#     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+#
+#     min_white_pixels_to_fill = binary.size // num_choices * 0.3
+#
+#     for i in range(num_choices):
+#         bubble = binary[:, i * bubble_width:(i + 1) * bubble_width]
+#         white_pixels = cv2.countNonZero(bubble)
+#
+#         if white_pixels > max_white_pixels:
+#             max_white_pixels = white_pixels
+#             filled_bubble_index = i
+#
+#         # Check if the bubble is considered filled
+#         if white_pixels >= min_white_pixels_to_fill:
+#             filled_bubble_count += 1
+#
+#     # Return None if more than one bubble is filled or if no bubble is sufficiently filled
+#     if filled_bubble_count != 1:
+#         return None
+#
+#     return chr(ord('A') + filled_bubble_index) if filled_bubble_index is not None else None
+
+
+# def process_bubble_row(self, image, num_choices=5):
+#     bubble_width = image.shape[1] // num_choices
+#     filled_bubbles = []  # To store indices of filled bubbles
+#
+#     # Convert the image to grayscale and apply a threshold to get a binary image
+#     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+#
+#     min_white_pixels_to_fill = binary.size // num_choices * 0.3
+#
+#     for i in range(num_choices):
+#         bubble = binary[:, i * bubble_width:(i + 1) * bubble_width]
+#         white_pixels = cv2.countNonZero(bubble)
+#
+#         # Check if the bubble is considered filled
+#         if white_pixels >= min_white_pixels_to_fill:
+#             filled_bubbles.append(i)
+#
+#     # Return the list of filled bubble indices converted to their corresponding letter options
+#     return [chr(ord('A') + index) for index in filled_bubbles]
+#
+
+def process_bubble_row(self, image, num_choices=5):
     bubble_width = image.shape[1] // num_choices
-    max_white_pixels = 0
-    filled_bubble_index = None
-    filled_bubble_count = 0  # To count the number of filled bubbles
+    filled_bubbles = []
 
-    # Convert the image to grayscale and apply a threshold to get a binary image
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+    _, binary = cv2.threshold(gray, 137, 255, cv2.THRESH_BINARY_INV)
 
-    min_white_pixels_to_fill = binary.size // num_choices * 0.3
+    min_white_pixels_to_fill = binary.size // num_choices * 0.39
 
     for i in range(num_choices):
         bubble = binary[:, i * bubble_width:(i + 1) * bubble_width]
         white_pixels = cv2.countNonZero(bubble)
 
-        if white_pixels > max_white_pixels:
-            max_white_pixels = white_pixels
-            filled_bubble_index = i
-
-        # Check if the bubble is considered filled
         if white_pixels >= min_white_pixels_to_fill:
-            filled_bubble_count += 1
+            filled_bubbles.append(i)
 
-    # Return None if more than one bubble is filled or if no bubble is sufficiently filled
-    if filled_bubble_count != 1:
+    if len(filled_bubbles) == 0:
         return None
+    elif len(filled_bubbles) == 1:
+        return chr(ord('A') + filled_bubbles[0])
+    else:
+        #return [chr(ord('A') + index) for index in filled_bubbles]
+        return "multi"
 
-    return chr(ord('A') + filled_bubble_index) if filled_bubble_index is not None else None
 
 
 def find_rows_by_projection(image):
@@ -179,7 +257,8 @@ def process_student_id(roi, num_columns=10, num_bubbles=10):
 
 def process_all_students(folder_path):
     students_results = []
-
+    # Get all student image folders and sort them to maintain order
+    # student_image_folders = sorted(os.listdir(base_folder_path))
     for student_folder in os.listdir(folder_path):
         student_folder_path = os.path.join(folder_path, student_folder)
         if os.path.isdir(student_folder_path):
@@ -218,3 +297,5 @@ def process_all_students(folder_path):
 
 # folder_path = 'data/ROIs'
 # process_all_students(folder_path)
+
+
