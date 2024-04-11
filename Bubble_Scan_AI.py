@@ -18,7 +18,7 @@ class Scantron95945:
         self.template_matching()
         self.extractROIs()
         self.extract_responses()
-        # shutil.rmtree("data")
+        shutil.rmtree("data")
 
     def extractImagesFromPdf(self):
 
@@ -26,10 +26,10 @@ class Scantron95945:
         pdf_document = fitz.open(self.pdf_path)
         print("------Extracting all the Images from PDF------")
 
-        # Determining PDF name for creating a sub-folder
+        # Determining PDF name for creating a Sub folder
         self.pdf_name = os.path.splitext(os.path.basename(self.pdf_path))[0]
 
-        # Creating a sub-folder for the PDF
+        # Creating a Sub Folder for the PDF
         pdf_folder = os.path.join(self.output_folder, self.pdf_name)
         os.makedirs(pdf_folder, exist_ok=True)
 
@@ -42,14 +42,14 @@ class Scantron95945:
             original_pix = page.get_pixmap(matrix=fitz.Identity, colorspace=fitz.csRGB, clip=None, annots=True)
 
             # Calculating scaling factors
-            scale_x = 1540 / original_pix.width
-            scale_y = 2000 / original_pix.height
+            scale_x = 1689 / original_pix.width
+            scale_y = 2186 / original_pix.height
 
             # Apply scaling
             matrix = fitz.Matrix(scale_x, scale_y)
 
             # Get the scaled pixmap
-            pix = page.get_pixmap(matrix=matrix, dpi=300, colorspace=fitz.csRGB, clip=None, annots=True)
+            pix = page.get_pixmap(matrix=matrix, colorspace=fitz.csRGB, clip=None, annots=True)
 
             # Saving the image
             image_path = os.path.join(pdf_folder, image_filename)
@@ -193,17 +193,17 @@ class Scantron95945:
 
         # Calculating the ROI using the intersection of these markers for the first column
         x1_first_column = top_marker_1[0]
-        x2_first_column = top_marker_1[0] + 160
+        x2_first_column = top_marker_1[0] + 165
         y1_columns = left_marker_5[1] - 10
-        y2_columns = left_marker_53[1] + left_marker_53[3] + 10
+        y2_columns = left_marker_53[1] + left_marker_53[3] + 12
 
         # Cropping the image for the first column
         first_column_roi = image[y1_columns:y2_columns, x1_first_column:x2_first_column]
 
         # Calculating the ROI using the intersection of these markers for the second column
         x1_second_column = x2_first_column + 100
-        x2_second_column = top_marker_3[0] + top_marker_3[2] + 10
-        y1_columns = left_marker_5[1] + 10
+        x2_second_column = top_marker_3[0] + top_marker_3[2] + 3
+        y1_columns = left_marker_5[1] + 14
         y2_columns = left_marker_53[1] + left_marker_53[3] + 35
 
         # Cropping the image for the second column
@@ -260,7 +260,8 @@ class Scantron95945:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
 
-        min_white_pixels_to_fill = binary.size // num_choices * 0.39
+        min_white_pixels_to_fill = binary.size // num_choices * 0.38
+        # Adjust the 0.38 value to consider the lightly bubbled responses.
 
         for i in range(num_choices):
             bubble = binary[:, i * bubble_width:(i + 1) * bubble_width]
@@ -274,8 +275,8 @@ class Scantron95945:
         elif len(filled_bubbles) == 1:
             return chr(ord('A') + filled_bubbles[0])
         else:
-            # return [chr(ord('A') + index) for index in filled_bubbles]
-            return "multi"
+            return [chr(ord('A') + index) for index in filled_bubbles]
+            # return "multi"
 
     def find_rows(self, image):
 
@@ -292,7 +293,7 @@ class Scantron95945:
         # Detecting the row breaks where the sum of the projection falls below a threshold
         row_breaks = np.where(vertical_projection < np.max(vertical_projection) * 0.1)[0]
 
-        # Initializing row boundaries list and add a boundary if the first row starts at the top
+        # Initializing a row boundaries list and add a boundary if the first row starts at the top
         row_boundaries = []
         if row_breaks[0] != 0:
             row_boundaries.append((0, row_breaks[0]))
